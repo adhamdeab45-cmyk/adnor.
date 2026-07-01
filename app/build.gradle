@@ -1,0 +1,30 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.adnor.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.adnor.app'
+        minSdk 23
+        targetSdk 35
+        versionCode 3
+        versionName '1.2.0'
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+        }
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.browser:browser:1.7.0'
+}
