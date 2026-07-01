@@ -7,98 +7,70 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.browser.customtabs.CustomTabsIntent;
+import android.widget.Button;
 
 public class MainActivity extends Activity {
-    private static final String ADNOR_URL = "https://aadnor.onrender.com/";
-    private boolean launchedOnce = false;
+    private static final String ADNOR_URL = "https://aadnor.onrender.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        buildLauncherScreen();
-        if (savedInstanceState == null) {
-            openAdnor();
-        }
+        showLauncherScreen();
+        openAdnorSecureBrowser();
     }
 
-    private void buildLauncherScreen() {
+    private void showLauncherScreen() {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setGravity(Gravity.CENTER);
-        root.setPadding(48, 48, 48, 48);
+        root.setPadding(40, 40, 40, 40);
         root.setBackgroundColor(Color.rgb(2, 2, 8));
 
-        TextView crown = new TextView(this);
-        crown.setText("♛");
-        crown.setTextSize(54);
-        crown.setTextColor(Color.rgb(212, 175, 55));
-        crown.setGravity(Gravity.CENTER);
-        root.addView(crown);
+        TextView logo = new TextView(this);
+        logo.setText("ADNOR");
+        logo.setTextColor(Color.rgb(212, 175, 55));
+        logo.setTextSize(42);
+        logo.setGravity(Gravity.CENTER);
+        logo.setTypeface(null, 1);
 
-        TextView title = new TextView(this);
-        title.setText("ADNOR");
-        title.setTextSize(42);
-        title.setTextColor(Color.rgb(244, 211, 94));
-        title.setGravity(Gravity.CENTER);
-        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        root.addView(title);
+        TextView msg = new TextView(this);
+        msg.setText("جاري فتح التطبيق بأمان...");
+        msg.setTextColor(Color.WHITE);
+        msg.setTextSize(18);
+        msg.setGravity(Gravity.CENTER);
+        msg.setPadding(0, 25, 0, 25);
 
-        TextView sub = new TextView(this);
-        sub.setText("اضغط فتح ADNOR للدخول للتطبيق");
-        sub.setTextSize(16);
-        sub.setTextColor(Color.WHITE);
-        sub.setGravity(Gravity.CENTER);
-        sub.setPadding(0, 22, 0, 28);
-        root.addView(sub);
+        Button btn = new Button(this);
+        btn.setText("فتح ADNOR");
+        btn.setTextSize(16);
+        btn.setOnClickListener(v -> openAdnorSecureBrowser());
 
-        Button open = new Button(this);
-        open.setText("فتح ADNOR");
-        open.setTextSize(18);
-        open.setTextColor(Color.BLACK);
-        open.setBackgroundColor(Color.rgb(212, 175, 55));
-        open.setOnClickListener(v -> openAdnor());
-        root.addView(open, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-
-        TextView note = new TextView(this);
-        note.setText("هذه النسخة تستخدم متصفحًا آمنًا حتى يعمل تسجيل الدخول عبر Google بشكل صحيح.");
-        note.setTextSize(12);
-        note.setTextColor(Color.rgb(180, 180, 180));
-        note.setGravity(Gravity.CENTER);
-        note.setPadding(0, 28, 0, 0);
-        root.addView(note);
-
+        root.addView(logo);
+        root.addView(msg);
+        root.addView(btn);
         setContentView(root);
     }
 
-    private void openAdnor() {
+    private void openAdnorSecureBrowser() {
         Uri uri = Uri.parse(ADNOR_URL);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        // Prefer Chrome when installed, because Google login accepts it as a secure browser.
+        Intent chromeIntent = new Intent(intent);
+        chromeIntent.setPackage("com.android.chrome");
         try {
-            CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
-                    .setShowTitle(false)
-                    .setToolbarColor(Color.rgb(2, 2, 8))
-                    .setNavigationBarColor(Color.BLACK)
-                    .setUrlBarHidingEnabled(true)
-                    .build();
-            customTabsIntent.intent.putExtra(Intent.EXTRA_REFERRER, Uri.parse("android-app://" + getPackageName()));
-            customTabsIntent.launchUrl(this, uri);
-            launchedOnce = true;
-        } catch (ActivityNotFoundException ex) {
-            try {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(browserIntent);
-            } catch (Exception e) {
-                Toast.makeText(this, "تعذر فتح ADNOR. تأكد من وجود متصفح على الجهاز.", Toast.LENGTH_LONG).show();
-            }
+            startActivity(chromeIntent);
+            return;
+        } catch (ActivityNotFoundException ignored) { }
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // Keep launcher screen visible if no browser exists.
         }
     }
 }

@@ -1,24 +1,20 @@
-# ADNOR V79 — Android Secure Browser Build Fix
+# ADNOR V80 Android APK - Secure Browser No Library Fix
 
-هذه النسخة تصلح فشل GitHub Actions في خطوة `checkDebugAarMetadata`.
+هذه النسخة لا تستخدم WebView ولا مكتبة androidx.browser، لذلك تتجنب خطأ Google disallowed_useragent وتتجنب خطأ بناء androidx.browser.
 
-## سبب الإصلاح
-نسخة V78 كانت تستخدم مكتبة `androidx.browser:browser:1.8.0`، وعلى GitHub Actions ظهر تعارض AAR Metadata.
-في V79 ثبتنا المكتبة على نسخة أكثر استقرارًا: `androidx.browser:browser:1.7.0`.
+طريقة العمل:
+- التطبيق يظهر باسم ADNOR وبأيقونة ADNOR.
+- عند فتح التطبيق يفتح موقع ADNOR في Chrome/المتصفح الآمن.
+- تسجيل الدخول باستخدام Google يعمل عبر متصفح آمن بدل WebView.
 
-## طريقة الرفع
-1. أنشئ Repository جديد باسم مثلًا: `adnor-android-v79`.
-2. فك ضغط ZIP.
-3. افتح مجلد `adnor_v79_android`.
-4. ارفع محتويات المجلد فقط، وليس المجلد نفسه:
-   - app
+طريقة الرفع:
+1. أنشئ Repository جديد ونظيف باسم adnor-android-v80.
+2. ارفع محتويات مجلد adnor_v80_android فقط، وليس المجلد نفسه.
+3. يجب أن تظهر في الجذر:
    - .github
+   - app
    - build.gradle
    - settings.gradle
    - README_AR.md
-5. افتح Actions.
-6. شغّل `Build ADNOR APK`.
-7. بعد نجاح البناء، حمّل Artifacts باسم `ADNOR-APK`.
-
-## ملاحظة
-هذه النسخة تفتح موقع ADNOR عبر Chrome Custom Tabs حتى يعمل تسجيل الدخول عبر Google بدون خطأ WebView.
+4. افتح Actions ثم شغل Build ADNOR APK.
+5. بعد نجاح البناء، حمل Artifact باسم ADNOR-APK.
